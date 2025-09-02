@@ -534,7 +534,7 @@ DFRL:NewMod("Ui", 5, function()
                 local healthPercent = UnitHealth("player") / UnitHealthMax("player") * 100
 
                 local threshold = DFRL:GetTempDB("Ui", "lowHpThreshold")
-                if healthPercent <= threshold then
+                if healthPercent <= threshold and not UnitDeadOrGhost("Player") then
                     DFRL.lowHpWarnFrame:Show()
                     DFRL.activeScripts["LowHpWarnScript"] = true
 
