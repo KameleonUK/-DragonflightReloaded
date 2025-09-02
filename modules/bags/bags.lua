@@ -39,6 +39,7 @@ DFRL:NewMod("Bags", 1, function()
 
             MainMenuBarBackpackButton:ClearAllPoints()
             MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -5, 36)
+            MainMenuBarBackpackButton:SetParent("UIParent")
             MainMenuBarBackpackButton:SetClampedToScreen(true)
 
             MainMenuBarBackpackButton:SetScale(DFRL:GetTempDB("Bags", "bagScale"))
