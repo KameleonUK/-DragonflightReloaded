@@ -188,11 +188,22 @@ DFRL:NewMod("Map", 1, function()
             BuffButton8:ClearAllPoints()
             BuffButton8:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -15)
 
+            BuffButton16:ClearAllPoints()
+            BuffButton16:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -110, -120)            
+
+            BuffButton24:ClearAllPoints()
+            BuffButton24:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -30)
+
+            BuffButton32:ClearAllPoints() -- Appears to be first debuff when tested with Weaken Soul
+            BuffButton32:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -45)
+
+            BuffButton40:ClearAllPoints()
+            BuffButton40:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -60)
+
             TempEnchant1:ClearAllPoints()
             TempEnchant1:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -75)
 
-            BuffButton16:ClearAllPoints()
-            BuffButton16:SetPoint("TOPRIGHT", Setup.topPanel, "TOPLEFT", -50, -120)
+
         end
 
         function Setup:Tracker()
