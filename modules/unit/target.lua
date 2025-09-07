@@ -4,8 +4,10 @@ DFRL:NewDefaults("Target", {
     textShow = {true, "checkbox", nil, nil, "target text settings", 2, "Show health and mana text", nil, nil},
     noPercent = {true, "checkbox", nil, nil, "target text settings", 3, "Show only current values without percentages", nil, nil},
     textColoring = {false, "checkbox", nil, nil, "target text settings", 4, "Color text based on health/mana percentage", nil, nil},
-    healthSize = {15, "slider", {8, 20}, nil, "target text settings", 5, "Health text font size", nil, nil},
-    manaSize = {9, "slider", {8, 20}, nil, "target text settings", 6, "Mana text font size", nil, nil},
+    nameSize = {11, "slider", {8, 20, 0.5}, nil, "target text settings", 5, "Target name text font size", nil, nil},
+    levelSize = {11, "slider", {8, 20, 0.5}, nil, "target text settings", 6, "Target level text font size", nil, nil},
+    healthSize = {15, "slider", {8, 20, 0.5}, nil, "target text settings", 7, "Health text font size", nil, nil},
+    manaSize = {9, "slider", {8, 20, 0.5}, nil, "target text settings", 8, "Mana text font size", nil, nil},
     frameFont = {"BigNoodleTitling", "dropdown", {
         "FRIZQT__.TTF",
         "Expressway",
@@ -370,6 +372,16 @@ DFRL:NewMod("Target", 1, function()
         configCache.lastUpdate = GetTime()
         Setup:UpdateTexts()
     end
+
+    callbacks.nameSize = function(value)
+        Setup.texts.config.nameFontSize = value
+        TargetFrame.name:SetFont(Setup.texts.config.font, value, "OUTLINE")
+    end
+
+    callbacks.levelSize = function(value)
+        Setup.texts.config.levelFontSize = value
+        TargetLevelText:SetFont(Setup.texts.config.font, value, "OUTLINE")
+    end    
 
     callbacks.healthSize = function(value)
         Setup.texts.config.healthFontSize = value
