@@ -5,8 +5,10 @@ DFRL:NewDefaults("Player", {
     textShow = {true, "checkbox", nil, nil, "text settings", 3, "Show health and mana text", nil, nil},
     noPercent = {true, "checkbox", nil, nil, "text settings", 4, "Show only current values without percentages", nil, nil},
     textColoring = {false, "checkbox", nil, nil, "text settings", 5, "Color text based on health/mana percentage from white to red", nil, nil},
-    healthSize = {15, "slider", {8, 20}, nil, "text settings", 6, "Health text font size", nil, nil},
-    manaSize = {9, "slider", {8, 20}, nil, "text settings", 7, "Mana text font size", nil, nil},
+    nameSize = {11, "slider", {8, 20, 1}, nil, "text settings", 6, "Player name text font size", nil, nil},
+    levelSize = {11, "slider", {8, 20, 1}, nil, "text settings", 7, "Player level text font size", nil, nil},
+    healthSize = {15, "slider", {8, 20, 1}, nil, "text settings", 8, "Health text font size", nil, nil},
+    manaSize = {9, "slider", {8, 20, 1}, nil, "text settings", 9, "Mana text font size", nil, nil},
     frameFont = {"BigNoodleTitling", "dropdown", {
         "FRIZQT__.TTF",
         "Expressway",
@@ -406,6 +408,16 @@ DFRL:NewMod("Player", 1, function()
             Setup.texts.manaPercent:SetTextColor(mc[1], mc[2], mc[3])
         end
     end
+
+    callbacks.nameSize = function(value)
+        Setup.texts.config.nameFontSize = value
+        PlayerFrame.name:SetFont(Setup.texts.config.font, value, "OUTLINE")
+    end
+
+    callbacks.levelSize = function(value)
+        Setup.texts.config.levelFontSize = value
+        PlayerLevelText:SetFont(Setup.texts.config.font, value, "OUTLINE")
+    end    
 
     callbacks.healthSize = function(value)
         Setup.texts.config.healthFontSize = value
