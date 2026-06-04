@@ -214,6 +214,7 @@ f:SetScript("OnEvent", function()
     local char = UnitName("player")
     if not DFRL_CUR_PROFILE[char .. "_firstRun"] then
         Setup:WelcomePage()
+        if MiniMapFrame then MiniMapFrame:SetScale(1.0) end
     end
 
     local seenVersion = DFRL:GetTempValue("Generic", "patchWarnVersion")

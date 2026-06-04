@@ -80,7 +80,8 @@ DFRL:NewMod("Gui-elem", 3, function()
             ["Player"]  = {14, 1},
             ["PVPIcon"]  = {14, 2},
             ["Target"]  = {14, 3},
-            ["Mini"]    = {14, 4},
+            ["Focus"]   = {14, 4},
+            ["Mini"]    = {14, 5},
             ["Xprep"]   = {15, 1},
         },
     }

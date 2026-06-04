@@ -208,8 +208,8 @@ DFRL:NewMod("Map", 1, function()
 
         function Setup:Tracker()
             MiniMapTrackingFrame:ClearAllPoints()
-            MiniMapTrackingFrame:SetPoint("TOPRIGHT", self.topPanel, "TOPLEFT", -15, 0)
-            MiniMapTrackingFrame:SetScale(0.6)
+            MiniMapTrackingFrame:SetPoint("TOPRIGHT", self.topPanel, "TOPLEFT", 0,5)
+            MiniMapTrackingFrame:SetScale(1.2)
             MiniMapTrackingBorder:Hide()
         end
 
@@ -239,6 +239,12 @@ DFRL:NewMod("Map", 1, function()
             if _G.EBC_Minimap then
                 _G.EBC_Minimap:Hide()
                 _G.EBC_Minimap.Show = function() end
+
+                -- Reparent the dropdown to UIParent so it can be shown
+                -- even though its original parent (EBC_Minimap) is permanently hidden.
+                if _G.EBCMinimapDropdown then
+                    _G.EBCMinimapDropdown:SetParent(UIParent)
+                end
 
                 self.ebcMinimap = _G.EBC_Minimap
             end

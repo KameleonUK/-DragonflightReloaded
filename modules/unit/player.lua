@@ -22,18 +22,18 @@ DFRL:NewDefaults("Player", {
         "BigNoodleTitling",
         "Continuum",
         "DieDieDie"
-    }, nil, "text settings", 8, "Change the font used for the playerframe", nil, nil},
-    classColor = {false, "checkbox", nil, nil, "bar color", 9, "Color health bar based on class", nil, nil},
-    classPortrait = {false, "checkbox", nil, nil, "tweaks", 10, "Activate 2D class portrait icons", nil, nil},
-    frameHide = {false, "checkbox", nil, nil, "tweaks", 11, "Hide frame at full HP when not in combat", nil, nil},
-    frameScale = {1, "slider", {0.7, 1.3}, nil, "tweaks", 12, "Adjust frame size", nil, nil},
-    combatGlow = {true, "checkbox", nil, nil, "effects", 13, "Enable combat pulse animation", nil, nil},
-    glowSpeed = {1, "slider", {0.4, 5}, nil, "effects", 14, "Adjust the speed of the combat pulsing", nil, nil},
-    glowAlpha = {1, "slider", {0.1, 1}, nil, "effects", 15, "Adjust the maximum alpha of the combat pulsing", nil, nil},
-    restingGlow = {true, "checkbox", nil, nil, "effects", 16, "Enable resting glow animation", nil, nil},
-    restingSpeed = {1, "slider", {0.4, 5}, nil, "effects", 17, "Adjust the speed of the resting pulsing", nil, nil},
-    restingAlpha = {1, "slider", {0.1, 1}, nil, "effects", 18, "Adjust the maximum alpha of the resting pulsing", nil, nil},
-    restingColor = {{0, 1, 1}, "colour", nil, nil, "effects", 19, "Changes the colour of the resting glow animation", nil, nil},
+    }, nil, "text settings", 8, "Change the font used for the playerframe", nil, nil },
+    classColor = { false, "checkbox", nil, nil, "bar color", 9, "Color health bar based on class", nil, nil },
+    classPortrait = { false, "checkbox", nil, nil, "tweaks", 10, "Activate 2D class portrait icons", nil, nil },
+    frameHide = { false, "checkbox", nil, nil, "tweaks", 11, "Hide frame at full HP when not in combat", nil, nil },
+    frameScale = { 1, "slider", { 0.7, 1.3 }, nil, "tweaks", 12, "Adjust frame size", nil, nil },
+    combatGlow = { true, "checkbox", nil, nil, "effects", 13, "Enable combat pulse animation", nil, nil },
+    glowSpeed = { 1, "slider", { 0.4, 5 }, nil, "effects", 14, "Adjust the speed of the combat pulsing", nil, nil },
+    glowAlpha = { 1, "slider", { 0.1, 1 }, nil, "effects", 15, "Adjust the maximum alpha of the combat pulsing", nil, nil },
+    restingGlow = { true, "checkbox", nil, nil, "effects", 16, "Enable resting glow animation", nil, nil },
+    restingSpeed = { 1, "slider", { 0.4, 5 }, nil, "effects", 17, "Adjust the speed of the resting pulsing", nil, nil },
+    restingAlpha = { 1, "slider", { 0.1, 1 }, nil, "effects", 18, "Adjust the maximum alpha of the resting pulsing", nil, nil },
+    restingColor = { { 0, 1, 1 }, "colour", nil, nil, "effects", 19, "Changes the colour of the resting glow animation", nil, nil },
 })
 
 DFRL:NewMod("Player", 1, function()
@@ -61,7 +61,7 @@ DFRL:NewMod("Player", 1, function()
             fadeSpeed = 1.0,
             alphaMin = 0,
             alphaMax = 1.0,
-            color = {0, 1, 1},
+            color = { 0, 1, 1 },
         },
 
         texts = {
@@ -78,10 +78,10 @@ DFRL:NewMod("Player", 1, function()
                 nameFontSize = 9,
                 levelFontSize = 9,
                 outline = "NONE",
-                nameColor = {1, .82, 0},
-                levelColor = {1, .82, 0},
-                healthColor = {1, 1, 1},
-                manaColor = {1, 1, 1},
+                nameColor = { 1, .82, 0 },
+                levelColor = { 1, .82, 0 },
+                healthColor = { 1, 1, 1 },
+                manaColor = { 1, 1, 1 },
             }
         }
     }
@@ -167,13 +167,14 @@ DFRL:NewMod("Player", 1, function()
 
     function Setup:CombatGlow()
         function _G.PlayerFrame_UpdateStatus() end
+
         PlayerAttackGlow:SetTexture("")
         PlayerAttackIcon:SetTexture("")
         Setup.combatOverlay = CreateFrame("Frame", nil, PlayerFrame)
         Setup.combatOverlay:SetAllPoints(PlayerFrame)
         Setup.combatOverlay:SetFrameStrata("MEDIUM")
         Setup.combatOverlayTex = Setup.combatOverlay:CreateTexture(nil, "OVERLAY")
-        Setup.combatOverlayTex:SetTexture(Setup.texpath.. "UI-Player-Status.blp")
+        Setup.combatOverlayTex:SetTexture(Setup.texpath .. "UI-Player-Status.blp")
         Setup.combatOverlayTex:SetPoint("CENTER", PlayerFrame, "CENTER", 45, -21)
         Setup.combatOverlayTex:SetVertexColor(1, 0, 0)
         Setup.combatOverlayTex:SetBlendMode("ADD")
@@ -183,13 +184,14 @@ DFRL:NewMod("Player", 1, function()
     function Setup:RestingGlow()
         PlayerRestIcon:SetTexture("")
         PlayerRestGlow:SetTexture("")
-        Setup.restingOverlay = CreateFrame("Frame", nil, PlayerFrame)
+        Setup.restingOverlay = CreateFrame("Frame", playerRestingGlow, PlayerFrame)
         Setup.restingOverlay:SetAllPoints(PlayerFrame)
         Setup.restingOverlay:SetFrameStrata("MEDIUM")
         Setup.restingOverlayTex = Setup.restingOverlay:CreateTexture(nil, "OVERLAY")
-        Setup.restingOverlayTex:SetTexture(Setup.texpath.. "UI-Player-Status.blp")
+        Setup.restingOverlayTex:SetTexture(Setup.texpath .. "UI-Player-Status.blp")
         Setup.restingOverlayTex:SetPoint("CENTER", PlayerFrame, "CENTER", 45, -21)
-        Setup.restingOverlayTex:SetVertexColor(Setup.restingGlow.color[1], Setup.restingGlow.color[2], Setup.restingGlow.color[3])
+        Setup.restingOverlayTex:SetVertexColor(Setup.restingGlow.color[1], Setup.restingGlow.color[2],
+            Setup.restingGlow.color[3])
         Setup.restingOverlayTex:SetBlendMode("ADD")
         Setup.restingOverlayTex:SetAlpha(0)
     end
@@ -200,15 +202,15 @@ DFRL:NewMod("Player", 1, function()
         restingAnimation:SetWidth(24)
         restingAnimation:SetHeight(24)
         local texture = restingAnimation:CreateTexture(nil, "OVERLAY")
-        texture:SetTexture(Setup.texpath.. "UIUnitFrameRestingFlipbook")
+        texture:SetTexture(Setup.texpath .. "UIUnitFrameRestingFlipbook")
         texture:SetAllPoints(restingAnimation)
         local texCoords = {
-            {0/512, 60/512, 0/512, 60/512}, {60/512, 120/512, 0/512, 60/512}, {120/512, 180/512, 0/512, 60/512}, {180/512, 240/512, 0/512, 60/512}, {240/512, 300/512, 0/512, 60/512}, {300/512, 360/512, 0/512, 60/512},
-            {0/512, 60/512, 60/512,120/512}, {60/512, 120/512, 60/512, 120/512}, {120/512, 180/512, 60/512, 120/512}, {180/512, 240/512, 60/512, 120/512}, {240/512, 300/512, 60/512, 120/512}, {300/512, 360/512, 60/512, 120/512},
-            {0/512, 60/512, 120/512, 180/512}, {60/512, 120/512, 120/512, 180/512}, {120/512, 180/512, 120/512, 180/512}, {180/512, 240/512, 120/512, 180/512}, {240/512, 300/512, 120/512, 180/512}, {300/512, 360/512, 120/512, 180/512},
-            {0/512, 60/512, 180/512, 240/512}, {60/512, 120/512, 180/512, 240/512}, {120/512, 180/512, 180/512, 240/512}, {180/512, 240/512, 180/512, 240/512}, {240/512, 300/512, 180/512, 240/512}, {300/512, 360/512, 180/512, 240/512},
-            {0/512, 60/512, 240/512, 300/512}, {60/512, 120/512, 240/512, 300/512}, {120/512, 180/512, 240/512, 300/512}, {180/512, 240/512, 240/512, 300/512}, {240/512, 300/512, 240/512, 300/512}, {300/512, 360/512, 240/512, 300/512},
-            {0/512, 60/512, 300/512, 360/512}, {60/512, 120/512, 300/512, 360/512}, {120/512, 180/512, 300/512, 360/512}, {180/512, 240/512, 300/512, 360/512}, {240/512, 300/512, 300/512, 360/512}, {300/512, 360/512, 300/512, 360/512},
+            { 0 / 512, 60 / 512, 0 / 512, 60 / 512 }, { 60 / 512, 120 / 512, 0 / 512, 60 / 512 }, { 120 / 512, 180 / 512, 0 / 512, 60 / 512 }, { 180 / 512, 240 / 512, 0 / 512, 60 / 512 }, { 240 / 512, 300 / 512, 0 / 512, 60 / 512 }, { 300 / 512, 360 / 512, 0 / 512, 60 / 512 },
+            { 0 / 512, 60 / 512, 60 / 512, 120 / 512 }, { 60 / 512, 120 / 512, 60 / 512, 120 / 512 }, { 120 / 512, 180 / 512, 60 / 512, 120 / 512 }, { 180 / 512, 240 / 512, 60 / 512, 120 / 512 }, { 240 / 512, 300 / 512, 60 / 512, 120 / 512 }, { 300 / 512, 360 / 512, 60 / 512, 120 / 512 },
+            { 0 / 512, 60 / 512, 120 / 512, 180 / 512 }, { 60 / 512, 120 / 512, 120 / 512, 180 / 512 }, { 120 / 512, 180 / 512, 120 / 512, 180 / 512 }, { 180 / 512, 240 / 512, 120 / 512, 180 / 512 }, { 240 / 512, 300 / 512, 120 / 512, 180 / 512 }, { 300 / 512, 360 / 512, 120 / 512, 180 / 512 },
+            { 0 / 512, 60 / 512, 180 / 512, 240 / 512 }, { 60 / 512, 120 / 512, 180 / 512, 240 / 512 }, { 120 / 512, 180 / 512, 180 / 512, 240 / 512 }, { 180 / 512, 240 / 512, 180 / 512, 240 / 512 }, { 240 / 512, 300 / 512, 180 / 512, 240 / 512 }, { 300 / 512, 360 / 512, 180 / 512, 240 / 512 },
+            { 0 / 512, 60 / 512, 240 / 512, 300 / 512 }, { 60 / 512, 120 / 512, 240 / 512, 300 / 512 }, { 120 / 512, 180 / 512, 240 / 512, 300 / 512 }, { 180 / 512, 240 / 512, 240 / 512, 300 / 512 }, { 240 / 512, 300 / 512, 240 / 512, 300 / 512 }, { 300 / 512, 360 / 512, 240 / 512, 300 / 512 },
+            { 0 / 512, 60 / 512, 300 / 512, 360 / 512 }, { 60 / 512, 120 / 512, 300 / 512, 360 / 512 }, { 120 / 512, 180 / 512, 300 / 512, 360 / 512 }, { 180 / 512, 240 / 512, 300 / 512, 360 / 512 }, { 240 / 512, 300 / 512, 300 / 512, 360 / 512 }, { 300 / 512, 360 / 512, 300 / 512, 360 / 512 },
         }
 
         local currentFrame = 1
@@ -275,7 +277,7 @@ DFRL:NewMod("Player", 1, function()
 
     callbacks.playerDarkMode = function(value)
         local intensity = value or 0
-        local color = {1 - intensity, 1 - intensity, 1 - intensity}
+        local color = { 1 - intensity, 1 - intensity, 1 - intensity }
 
         PlayerFrameTexture:SetVertexColor(color[1], color[2], color[3])
         PlayerFrameBackground:SetVertexColor(color[1], color[2], color[3])
@@ -417,7 +419,7 @@ DFRL:NewMod("Player", 1, function()
     callbacks.levelSize = function(value)
         Setup.texts.config.levelFontSize = value
         PlayerLevelText:SetFont(Setup.texts.config.font, value, "OUTLINE")
-    end    
+    end
 
     callbacks.healthSize = function(value)
         Setup.texts.config.healthFontSize = value
@@ -514,7 +516,7 @@ DFRL:NewMod("Player", 1, function()
 
                 if class and frame.portrait then
                     local iconCoords = CLASS_ICON_TCOORDS[class]
-                    frame.portrait:SetTexture(Setup.texpath2 .."UI-Classes-Circles.tga")
+                    frame.portrait:SetTexture(Setup.texpath2 .. "UI-Classes-Circles.tga")
                     frame.portrait:SetTexCoord(unpack(iconCoords))
                 elseif not class and frame.portrait then
                     frame.portrait:SetTexCoord(0, 1, 0, 1)
@@ -593,7 +595,7 @@ DFRL:NewMod("Player", 1, function()
         PlayerFrame:SetScale(value)
     end
 
-    callbacks.combatGlow = function (value)
+    callbacks.combatGlow = function(value)
         if not Setup.combatOverlay or not Setup.combatOverlayTex then return end
 
         local pulseTime = 0
@@ -622,7 +624,8 @@ DFRL:NewMod("Player", 1, function()
                     pulseTime = pulseTime - pulseDuration
                 end
                 local progress = pulseTime / pulseDuration
-                local alpha = Setup.combatGlow.alphaMin + (Setup.combatGlow.alphaMax - Setup.combatGlow.alphaMin) * (0.5 + 0.5 * math.sin(progress * 2 * math.pi))
+                local alpha = Setup.combatGlow.alphaMin +
+                (Setup.combatGlow.alphaMax - Setup.combatGlow.alphaMin) * (0.5 + 0.5 * math.sin(progress * 2 * math.pi))
                 Setup.combatOverlayTex:SetAlpha(alpha)
                 DFRL.activeScripts["CombatGlowScript"] = true
             end)
@@ -684,7 +687,9 @@ DFRL:NewMod("Player", 1, function()
                 end
                 local progress = pulseTime / pulseDuration
 
-                local alpha = Setup.restingGlow.alphaMin + (Setup.restingGlow.alphaMax - Setup.restingGlow.alphaMin) * (0.5 + 0.5 * math.sin(progress * 2 * math.pi))
+                local alpha = Setup.restingGlow.alphaMin +
+                (Setup.restingGlow.alphaMax - Setup.restingGlow.alphaMin) *
+                (0.5 + 0.5 * math.sin(progress * 2 * math.pi))
                 Setup.restingOverlayTex:SetAlpha(alpha)
                 DFRL.activeScripts["RestingGlowScript"] = true
             end)
@@ -711,7 +716,7 @@ DFRL:NewMod("Player", 1, function()
         callbacks.restingGlow(DFRL:GetTempDB("Player", "restingGlow"))
     end
 
-    callbacks.restingColor = function (value)
+    callbacks.restingColor = function(value)
         Setup.restingGlow.color = value
         Setup.restingOverlayTex:SetVertexColor(value[1], value[2], value[3])
     end
@@ -748,7 +753,6 @@ DFRL:NewMod("Player", 1, function()
     f:RegisterEvent("PLAYER_REGEN_DISABLED")
     f:SetScript("OnEvent", function()
         if event == "PLAYER_ENTERING_WORLD" then
-
             Setup:Run()
             DFRL:NewCallbacks("Player", callbacks)
 
@@ -756,8 +760,8 @@ DFRL:NewMod("Player", 1, function()
         end
 
         if event == "PLAYER_REGEN_ENABLED" or
-        event == "PLAYER_REGEN_DISABLED" or
-        arg1 == "player" then
+            event == "PLAYER_REGEN_DISABLED" or
+            arg1 == "player" then
             callbacks.textShow(DFRL:GetTempDB("Player", "textShow"))
             callbacks.textColoring(DFRL:GetTempDB("Player", "textColoring"))
             callbacks.classColor(DFRL:GetTempDB("Player", "classColor"))

@@ -25,6 +25,8 @@ DFRL:NewDefaults("Target", {
     colorReaction = {true, "checkbox", nil, nil, "target bar color", 8, "Color health bar based on target reaction", nil, nil},
     colorClass = {false, "checkbox", nil, nil, "target bar color", 9, "Color health bar based on target class", nil, nil},
     frameScale = {1, "slider", {0.7, 1.3}, nil, "target tweaks", 10, "Adjust frame size", nil, nil},
+    hideEnemyDebuffs = {false, "checkbox", nil, nil, "buffs and debuffs", 11, "Hide Enemy Debuffs", nil, nil},
+    hideFriendlyBuffs = {false, "checkbox", nil, nil, "buffs and debuffs", 12, "Hide Friendly Player Buffs", nil, nil},
 })
 
 DFRL:NewMod("Target", 1, function()
@@ -265,7 +267,7 @@ DFRL:NewMod("Target", 1, function()
             elseif (classification == "rare") then
                 TargetFrameTexture:SetTexture(self.texpath .. "UI-TargetingFrame-Rare.blp")
             else
-                TargetFrameTexture:SetTexture(self.texpath .. "UI-TargetingFrameDF1.blp")
+                TargetFrameTexture:SetTexture(self.texpath .. "UI-TargetingFrameDF.blp")
             end
         end
     end
@@ -317,6 +319,62 @@ DFRL:NewMod("Target", 1, function()
         end
 
         TargetFrameHealthBar:SetStatusBarColor(0, 1, 0)
+    end
+
+    function Setup:UpdateEnemyDebuffs()
+        local hideDebuffs = DFRL:GetTempDB("Target", "hideEnemyDebuffs")
+        local shouldHide = hideDebuffs and UnitExists("target") and UnitIsEnemy("player", "target")
+
+        for i = 1, 16 do
+            local debuffFrame = getglobal("TargetFrameDebuff" .. i)
+            if debuffFrame then
+                if shouldHide then
+                    debuffFrame:SetAlpha(0)
+                    debuffFrame:EnableMouse(false)
+                else
+                    debuffFrame:SetAlpha(1)
+                    debuffFrame:EnableMouse(true)
+                end
+            end
+        end
+
+        -- Turtle WoW uses buff slots 1-48 for overflow debuffs after 16 debuff slots are full
+        if TURTLE_WOW_VERSIONxx then
+          --  print("Turtle wow adding debufs in buffs - remove those too")
+            for i = 1, 16 do
+                local buffFrame = getglobal("TargetFrameBuff" .. i)
+                if buffFrame then
+                    if shouldHide then
+                        --print("We should hide Twow buff:" .. i)
+                        buffFrame:SetAlpha(0)
+                        buffFrame:Hide()
+                        buffFrame:EnableMouse(false)
+                    else
+                        buffFrame:SetAlpha(1)
+                        buffFrame:Show()
+                        buffFrame:EnableMouse(true)
+                    end
+                end
+            end
+        end
+    end
+
+    function Setup:UpdateFriendlyBuffs()
+        local hideBuffs = DFRL:GetTempDB("Target", "hideFriendlyBuffs")
+        local shouldHide = hideBuffs and UnitExists("target") and UnitIsPlayer("target") and not UnitIsEnemy("player", "target")
+
+        for i = 1, 48 do
+            local buffFrame = getglobal("TargetFrameBuff" .. i)
+            if buffFrame then
+                if shouldHide then
+                    buffFrame:SetAlpha(0)
+                    buffFrame:EnableMouse(false)
+                else
+                    buffFrame:SetAlpha(1)
+                    buffFrame:EnableMouse(true)
+                end
+            end
+        end
     end
 
     function Setup:Run()
@@ -446,6 +504,14 @@ DFRL:NewMod("Target", 1, function()
         TargetFrame:SetScale(value)
     end
 
+    callbacks.hideEnemyDebuffs = function(value)
+        Setup:UpdateEnemyDebuffs()
+    end
+
+    callbacks.hideFriendlyBuffs = function(value)
+        Setup:UpdateFriendlyBuffs()
+    end
+
     -- event handler
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -460,6 +526,8 @@ DFRL:NewMod("Target", 1, function()
             Setup:CheckTargetTapped()
             Setup:UpdateTexts()
             Setup:UpdateBarColor()
+            Setup:UpdateEnemyDebuffs()
+            Setup:UpdateFriendlyBuffs()
         elseif (event == "UNIT_HEALTH" and arg1 == "target") or
             (event == "UNIT_MANA" and arg1 == "target") or
             (event == "UNIT_ENERGY" and arg1 == "target") or
@@ -468,6 +536,8 @@ DFRL:NewMod("Target", 1, function()
             Setup:CheckTargetTapped()
             Setup:UpdateTexts()
             Setup:UpdateBarColor()
+            Setup:UpdateEnemyDebuffs()
+            Setup:UpdateFriendlyBuffs()
         end
 
         if event == "PLAYER_ENTERING_WORLD" then

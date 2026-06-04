@@ -228,10 +228,10 @@ DFRL:NewMod("Chat", 1, function()
         for i = 1, NUM_CHAT_WINDOWS do
             local f = _G["ChatFrame"..i]
             if value then
-                f:SetFadeDuration(0.1)
-                f:SetTimeVisible(10)
+                f:SetFadeDuration(1.5)
+                f:SetTimeVisible(20)
             else
-                f:SetFadeDuration(3)
+                f:SetFadeDuration(5)
                 f:SetTimeVisible(180)
             end
         end
