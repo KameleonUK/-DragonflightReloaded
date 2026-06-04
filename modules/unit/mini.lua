@@ -17,6 +17,7 @@ DFRL:NewDefaults("Mini", {
         "Continuum",
         "DieDieDie"
     }, nil, "mini text settings", 4, "Change the font used for all smaller frames", nil, nil},
+    healthSize = {13, "slider", {8, 20, 0.5}, nil, "mini text settings", 4, "Health text font size", nil, nil},
     colorReaction = {true, "checkbox", nil, nil, "mini bar color", 5, "Color health bar based on target reaction", nil, nil},
     colorClass = {false, "checkbox", nil, nil, "mini bar color", 6, "Color health bar based on target class", nil, nil},
     partyFrameScale = {1, "slider", {0.7, 1.3}, nil, "mini scaling", 7, "Adjust party frame size", nil, nil},
@@ -26,7 +27,7 @@ DFRL:NewDefaults("Mini", {
 
 DFRL:NewMod("Mini", 1, function()
     local configCache = {
-        noPercent = nil,
+        noHealth = nil,
         lastUpdate = 0
     }
 
@@ -65,19 +66,19 @@ DFRL:NewMod("Mini", 1, function()
 
     function Setup:PetFrameTexts()
         self.healthPercentText = PetFrameHealthBar:CreateFontString(nil, "OVERLAY")
-        self.healthPercentText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+        self.healthPercentText:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE")
         self.healthPercentText:SetPoint("LEFT", 5, 0)
         self.healthPercentText:SetTextColor(1, 1, 1)
         self.healthValueText = PetFrameHealthBar:CreateFontString(nil, "OVERLAY")
-        self.healthValueText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+        self.healthValueText:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE")
         self.healthValueText:SetPoint("RIGHT", -5, 0)
         self.healthValueText:SetTextColor(1, 1, 1)
         self.manaPercentText = PetFrameManaBar:CreateFontString(nil, "OVERLAY")
-        self.manaPercentText:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE")
+        self.manaPercentText:SetFont("Fonts\\FRIZQT__.TTF", 6, "OUTLINE")
         self.manaPercentText:SetPoint("LEFT", 5, 0)
         self.manaPercentText:SetTextColor(1, 1, 1)
         self.manaValueText = PetFrameManaBar:CreateFontString(nil, "OVERLAY")
-        self.manaValueText:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE")
+        self.manaValueText:SetFont("Fonts\\FRIZQT__.TTF", 6, "OUTLINE")
         self.manaValueText:SetPoint("RIGHT", -5, 0)
         self.manaValueText:SetTextColor(1, 1, 1)
     end
@@ -576,6 +577,13 @@ DFRL:NewMod("Mini", 1, function()
             end
         end
     end
+
+    callbacks.healthSize = function(value) 
+        Setup.healthFontSize = value
+        Setup.healthPercentText:SetFont(Setup.healthFontSize, value, true)
+        Setup.healthValueText:SetFont(Setup.healthFontSize, value, true)
+        Setup.UpdatePetTexts()
+    end    
 
     callbacks.petFrameScale = function(value)
         PetFrame:SetScale(value)

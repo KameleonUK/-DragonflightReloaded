@@ -35,6 +35,7 @@ DFRL:NewMod("Ui", 5, function()
             {"HelpFrame", "HelpFrameCloseButton", -50, -10},
             {"QuestFrame", "QuestFrameCloseButton", -34, -22},
             {"GuildMemberDetailFrame", "GuildMemberDetailCloseButton", -10, -10},
+            {"LootFrame", "LootCloseButton", -72, -15},
 
         }
 
@@ -132,7 +133,6 @@ DFRL:NewMod("Ui", 5, function()
             "ReputationFrame",
             "SkillFrame",
             "HonorFrame",
-
         }
 
         for i = 1, table.getn(subFrames) do
@@ -249,8 +249,8 @@ DFRL:NewMod("Ui", 5, function()
         ApplyCustomTextures(SpellBookFrame)
     end
 
-    -- optionsframe
-    do
+    -- optionsframe COMMENTED OUT AS UIOPTIONSFRAME IS NO MORE 1.18.1
+    --[[do
         local f = CreateFrame("Frame")
         f:RegisterEvent("PLAYER_ENTERING_WORLD")
         f:SetScript("OnEvent", function ()
@@ -260,15 +260,15 @@ DFRL:NewMod("Ui", 5, function()
             UIOptionsFrame:SetFrameStrata("DIALOG")
             UIOptionsFrame:ClearAllPoints()
             UIOptionsFrame:SetPoint("CENTER", 0, 0)
-            UIOptionsFrameTab1:SetFrameLevel(10)
-            UIOptionsFrameTab2:SetFrameLevel(10)
+            --OptionsFrameTab1:SetFrameLevel(10)
+            --OptionsFrameTab2:SetFrameLevel(10)
             UIOptionsFrameDefaults:SetFrameLevel(10)
             UIOptionsFrameCancel:SetFrameLevel(10)
             UIOptionsFrameOkay:SetFrameLevel(10)
             UIOptionsFrame:SetHitRectInsets(0,0,0,50)
         end)
 
-    end
+    end]]--
 
     -- timer frame
     do
@@ -290,6 +290,73 @@ DFRL:NewMod("Ui", 5, function()
         -- QuestTimerFrame:SetScript('OnUpdate', nil)
         QuestTimerFrame:Show()
         -- debugframe(QuestTimerFrame)
+    end
+
+    -- loot frame
+    do
+        --[[local texBase = "Interface\\AddOns\\-DragonflightReloaded\\media\\tex\\ui\\"
+
+        local function ApplyLootFrameTextures(frame)
+            if not frame then return end
+            if frame.lootCustomBg then return end
+            frame.lootCustomBg = true
+
+            -- Hide all original LootFrame textures first, before creating our own.
+            local regions = { frame:GetRegions() }
+            for i = 1, table.getn(regions) do
+                local r = regions[i]
+                if r and r:IsObjectType("Texture") then
+                    r:Hide()
+                end
+            end
+
+            -- Coverage area mirrors -Dragonflight3: TOPLEFT(10,0) to BOTTOMRIGHT(-70,0)
+            -- giving an effective 176x256px region (leaving the left 10px and right 70px clear).
+            --
+            -- Horizontal: top_right (128px wide) anchored to TOPRIGHT(-70,0), cropped to
+            --   rightmost 25% (32px, UV 0.75→1); occupies x=154→186. Seam at x=154.
+            --   top_left/bot_left cropped to 144px to fill x=10→154 (UV 0→144/256).
+            --
+            -- Vertical: 256px height, no bleed; each row = 128px.
+            --   top textures show their topmost 128px  (UV 0 → 0.5).
+            --   bot textures show their bottommost 128px (UV 0.5 → 1).
+            --   Both rows meet seamlessly at y=-128.
+
+            frame.lootBgTopLeft = frame:CreateTexture(nil, "OVERLAY")
+            frame.lootBgTopLeft:SetTexture(texBase .. "paperdoll_top_left.tga")
+            frame.lootBgTopLeft:SetWidth(144)
+            frame.lootBgTopLeft:SetHeight(128)
+            frame.lootBgTopLeft:SetTexCoord(0, 144/256, 0, 0.5)
+            frame.lootBgTopLeft:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, 0)
+
+            frame.lootBgTopRight = frame:CreateTexture(nil, "OVERLAY")
+            frame.lootBgTopRight:SetTexture(texBase .. "paperdoll_top_right.tga")
+            frame.lootBgTopRight:SetWidth(32)
+            frame.lootBgTopRight:SetHeight(128)
+            frame.lootBgTopRight:SetTexCoord(0.75, 1, 0, 0.5)
+            frame.lootBgTopRight:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -70, 0)
+
+            frame.lootBgBotLeft = frame:CreateTexture(nil, "OVERLAY")
+            frame.lootBgBotLeft:SetTexture(texBase .. "paperdoll_bot_left.tga")
+            frame.lootBgBotLeft:SetWidth(144)
+            frame.lootBgBotLeft:SetHeight(128)
+            frame.lootBgBotLeft:SetTexCoord(0, 144/256, 0.5, 1)
+            frame.lootBgBotLeft:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 10, 0)
+
+            frame.lootBgBotRight = frame:CreateTexture(nil, "OVERLAY")
+            frame.lootBgBotRight:SetTexture(texBase .. "paperdoll_bot_right.tga")
+            frame.lootBgBotRight:SetWidth(32)
+            frame.lootBgBotRight:SetHeight(128)
+            frame.lootBgBotRight:SetTexCoord(0.75, 1, 0.5, 1)
+            frame.lootBgBotRight:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -70, 0)
+        end
+
+        if LootFrame then
+            HookScript(LootFrame, "OnShow", function()
+                ApplyLootFrameTextures(LootFrame)
+            end)
+            ApplyLootFrameTextures(LootFrame)
+        end]]--
     end
 
     -- callbacks
@@ -534,7 +601,7 @@ DFRL:NewMod("Ui", 5, function()
                 local healthPercent = UnitHealth("player") / UnitHealthMax("player") * 100
 
                 local threshold = DFRL:GetTempDB("Ui", "lowHpThreshold")
-                if healthPercent <= threshold then
+                if healthPercent <= threshold and not UnitIsDeadOrGhost("Player") then
                     DFRL.lowHpWarnFrame:Show()
                     DFRL.activeScripts["LowHpWarnScript"] = true
 

@@ -43,6 +43,7 @@ modules\ui\errorHandler.lua
 
 modules\unit\player.lua
 modules\unit\target.lua
+modules\unit\focus.lua
 modules\unit\mini.lua
 modules\unit\cut.lua
 modules\unit\pvp.lua

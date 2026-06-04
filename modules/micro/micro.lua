@@ -121,9 +121,13 @@ DFRL:NewMod("Micro", 1, function()
         self.ebcButton:Show()
         self.ebcButton:Enable()
         self.ebcButton:SetScript("OnClick", function()
-            EBCMinimapDropdown:ClearAllPoints()
-            EBCMinimapDropdown:SetPoint("CENTER", self.ebcButton, 0, 65)
-            ShowEBCMinimapDropdown()
+            if EBCMinimapDropdown:IsVisible() then
+                EBCMinimapDropdown:Hide()
+            else
+                EBCMinimapDropdown:ClearAllPoints()
+                EBCMinimapDropdown:SetPoint("BOTTOMRIGHT", self.ebcButton, "TOP", 0, 5)
+                EBCMinimapDropdown:Show()
+            end
         end)
         self.ebcButton:SetScript("OnEnter", function()
             GameTooltip:SetOwner(self.ebcButton, "ANCHOR_RIGHT")

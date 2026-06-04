@@ -4,10 +4,6 @@ DFRL:NewDefaults("Collector", {
 })
 
 DFRL:NewMod("Collector", 1, function()
-
-    --=================
-    -- SETUP
-    --=================
     local Setup = {
         texpath = "Interface\\AddOns\\-DragonflightReloaded\\media\\tex\\minimap\\",
         collector = nil,
@@ -48,7 +44,7 @@ DFRL:NewMod("Collector", 1, function()
         local ignored = {
             "Note", "GatherNote", "MinimapIcon", "GatherMatePin", "QuestieNote",
             "MiniNotePOI", "CartographerNotesPOI", "RecipeRadarMinimapIcon",
-            "MinimapZoomIn", "MinimapZoomOut"
+            "MinimapZoomIn", "MinimapZoomOut", "LFTMinimapButton", "MinimapBattlefieldFrame"
         }
 
         local name = frame:GetName()
@@ -158,13 +154,37 @@ DFRL:NewMod("Collector", 1, function()
 
     function Setup:CreateToggleButton()
         local toggleButton = CreateFrame("Button", "MinimapButtonCollectorToggle", UIParent)
+        toggleButton:EnableMouse(true)
         toggleButton:SetWidth(16)
         toggleButton:SetHeight(16)
         toggleButton:SetPoint("RIGHT", Minimap, "LEFT", -12, 0)
         toggleButton:SetNormalTexture(self.texpath.. "dfrl_collector_toggle.tga")
         toggleButton:SetHighlightTexture(self.texpath.. "dfrl_collector_toggle.tga")
 
+        toggleButton:SetScript("OnEnter", function()
+            --print("This is on enter")
+            if not self.collector:IsVisible() then
+                self.collector:SetAlpha(0)
+                self.collector:Show()
+                UIFrameFadeIn(self.collector, 0.3, 0, 1)
+            end
+        end)
+
+        --[[toggleButton:SetScript("OnLeave", function()
+            if self.collector:IsVisible() then
+                UIFrameFadeOut(self.collector, 0.3, 1, 0)
+                self.collector.fadeInfo.finishedFunc = self.collector.Hide
+                self.collector.fadeInfo.finishedArg1 = self.collector
+            end
+            print("This is on leave")
+        end)        ]]
+
+        toggleButton:SetScript("OnMouseWheel", function()
+            print("This is mouse wheel")
+        end)
+
         toggleButton:SetScript("OnClick", function()
+            --print("This is mouse click")
             if self.collector:IsVisible() then
                 UIFrameFadeOut(self.collector, 0.3, 1, 0)
                 self.collector.fadeInfo.finishedFunc = self.collector.Hide
@@ -368,9 +388,6 @@ DFRL:NewMod("Collector", 1, function()
         end)
     end
 
-    --=================
-    -- INIT
-    --=================
     function Setup:Run()
         self:CleanupFrames()
         self:CollectorFrame()
@@ -381,13 +398,6 @@ DFRL:NewMod("Collector", 1, function()
 
     Setup:Run()
 
-    --=================
-    -- EXPOSE
-    --=================
-
-    --=================
-    -- CALLBACKS
-    --=================
     local callbacks = {}
 
     callbacks.collectDarkMode = function(value)
@@ -400,10 +410,6 @@ DFRL:NewMod("Collector", 1, function()
         if normalTex then normalTex:SetVertexColor(color[1], color[2], color[3]) end
         if highlightTex then highlightTex:SetVertexColor(color[1], color[2], color[3]) end
     end
-
-    --=================
-    -- EVENT
-    --=================
 
     DFRL:NewCallbacks("Collector", callbacks)
 end)

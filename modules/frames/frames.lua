@@ -236,11 +236,22 @@ DFRL:NewMod("Frames", 2, function()
             end)
         end
 
+        -- expose for use by modules that create frames after this point
+        DFRL.MakeFrameMovable = MakeFrameMovable
+
         -- make frames from list movable
         for i = 1, table.getn(framesToMakeMovable) do
             if framesToMakeMovable[i] then
                 MakeFrameMovable(framesToMakeMovable[i])
             end
+        end
+
+        -- microMenuContainer holds interactive child buttons. MakeFrameMovable sets
+        -- EnableMouse(true) on the container which intercepts OnEnter/OnLeave before
+        -- they reach the child buttons in WoW 1.12's event routing. Dragging is
+        -- handled by the overlay child frame so the container itself doesn't need it.
+        if DFRL.microMenuContainer then
+            DFRL.microMenuContainer:EnableMouse(false)
         end
 
         -- init

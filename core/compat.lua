@@ -95,7 +95,7 @@ function Setup:ShaguMetaData()
             ["Item Rarity Borders"]      = {true, "checkbox", nil, nil, "tooltip", 17, "Outline tooltips based on item rarity", nil, nil},
             ["Tooltip Details"]          = {true, "checkbox", nil, nil, "tooltip", 18, "Add extra details to item tooltips", nil, nil},
             ["Sell Junk"]                = {true, "checkbox", nil, nil, "vendor", 19, "Auto sell all gray quality junk", nil, nil},
-            ["Vendor Values"]            = {true, "checkbox", nil, nil, "vendor", 20, "Show vendor prices in all tooltips", nil, nil},
+            --["Vendor Values"]            = {true, "checkbox", nil, nil, "vendor", 20, "Show vendor prices in all tooltips", nil, nil},
             ["WorldMap Coordinates"]     = {true, "checkbox", nil, nil, "worldmap", 21, "Show cursor/player coordinates live", nil, nil},
             ["WorldMap Window"]          = {true, "checkbox", nil, nil, "worldmap", 22, "Movable and windowed world map UI", nil, nil},
         },

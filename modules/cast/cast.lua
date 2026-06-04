@@ -2,10 +2,10 @@ DFRL:NewDefaults("Cast", {
     enabled = {true},
     castDarkMode = {0, "slider", {0, 1}, nil, "appearance", 1, "Adjust dark mode intensity", nil, nil},
     setFillDirection = {"left", "dropdown", {"left", "right", "center"}, nil, "castbar Basic", 2, "Set fill direction", nil, nil},
+    showShadow = {true, "checkbox", nil, nil, "castbar Basic", 3, "Show drop shadow below the castbar", nil, nil},
     barWidth = {200, "slider", {120, 350}, nil, "castbar Basic", 4, "Change castbar width", nil, nil},
     barHeight = {16, "slider", {10, 30}, nil, "castbar Basic", 5, "Change castbar height", nil, nil},
-    showShadow = {true, "checkbox", nil, nil, "castbar Basic", 3, "Show drop shadow below the castbar", nil, nil},
-    castColor = {{1, 0.82, 0}, "colour", nil, nil, "castbar Basic", 4, "Change castbar color", nil, nil},
+    castColor = {{1, 0.82, 0}, "colour", nil, nil, "castbar Basic", 6, "Change castbar color", nil, nil},
     castFont = {"BigNoodleTitling", "dropdown", {
         "FRIZQT__.TTF",
         "Expressway",
@@ -20,13 +20,15 @@ DFRL:NewDefaults("Cast", {
         "Continuum",
         "DieDieDie"
     }, nil, "text settings", 7, "Change the font used for the castbar", nil, nil},
-    showTime = {true, "checkbox", nil, nil, "text settings", 8, "Show casting time", nil, nil},
-    showSpell = {true, "checkbox", nil, nil, "text settings", 9, "Show spell name text", nil, nil},
-    showIcon = {true, "checkbox", nil, nil, "text settings", 10, "Show casting spell icon", "REQUIRES SHAGUTWEAKS", nil},
-    fontSize = {12, "slider", {5, 25}, nil, "text settings", 11, "Change castbar font size", nil, nil},
-    spellX = {5, "slider", {-50, 50}, nil, "text settings", 12, "Change spell name X offset", nil, nil},
-    timeX = {-5, "slider", {-50, 50}, nil, "text settings", 13, "Change casting time X offset", nil, nil},
-    fontY = {-16, "slider", {-20, 20}, nil, "text settings", 14, "Change castbar font Y offset", nil, nil},
+    showTicks = {true, "checkbox", nil, nil, "castbar Basic", 8, "Show tick markers on channel spells (Requires SuperWoW)", nil, nil},
+    showTime = {true, "checkbox", nil, nil, "text settings", 9, "Show casting time", nil, nil},
+    showSpell = {true, "checkbox", nil, nil, "text settings", 10, "Show spell name text", nil, nil},
+    showRank = {true, "checkbox", nil, nil, "text settings", 11, "Show spell rank on castbar (Requires SuperWoW)", nil, nil},
+    showIcon = {true, "checkbox", nil, nil, "text settings", 12, "Show casting spell icon", "(Requires ShaguTweaks", nil},
+    fontSize = {12, "slider", {5, 25}, nil, "text settings", 13, "Change castbar font size", nil, nil},
+    spellX = {5, "slider", {-100, 200}, nil, "text settings", 14, "Change spell name X offset", nil, nil},
+    timeX = {-5, "slider", {-50, 50}, nil, "text settings", 15, "Change casting time X offset", nil, nil},
+    fontY = {-16, "slider", {-20, 20}, nil, "text settings", 16, "Change castbar font Y offset", nil, nil},
 })
 
 DFRL:NewMod("Cast", 1, function()
@@ -46,6 +48,8 @@ DFRL:NewMod("Cast", 1, function()
         dropshadow  = nil,
         text        = nil,
         timeText    = nil,
+        tickMarkers = {},
+        MAX_TICK_MARKERS = 10,
 
         config = {
             width            = 200,
@@ -66,6 +70,8 @@ DFRL:NewMod("Cast", 1, function()
             textColorName    = { r = 1, g = 1, b = 1 },
             textColorTime    = { r = 1, g = 1, b = 1 },
             fillDirection    = "left",
+            showChannelTicks = true,
+            showSpellRank    = true,
             animations = {
             useSpark = true,
             useFlash = true,
@@ -85,8 +91,43 @@ DFRL:NewMod("Cast", 1, function()
             mode       = nil,
             flashAlpha = 0,
             currentProgress = 0, -- 0 to 1
+            channelingSpell = nil,
+            channelingRank  = nil,
+            castSpellName   = nil,
+            castSpellRank   = nil,
         },
     }
+
+    local channelingTicks = {
+        -- Mage
+        ["Arcane Missiles"] = 5,
+        ["Blizzard"]        = 8,
+        ["Evocation"]       = 4,
+        -- Priest
+        ["Mind Flay"]       = 3,
+        -- Warlock
+        ["Drain Life"]      = 5,
+        ["Drain Soul"]      = 5,
+        ["Drain Mana"]      = 5,
+        ["Rain of Fire"]    = 4,
+        -- Druid
+        ["Tranquility"]     = 4,
+        ["Hurricane"]       = 10,
+        -- Hunter
+        ["Volley"]          = 6,
+        ["Mend Pet"]        = 5,
+    }
+
+    local rankFilter = {
+        ["Toy"] = true,
+    }
+
+    local function fmtSpell(name, rank, show)
+        if show and rank and rank ~= "" and not rankFilter[rank] then
+            return name .. " (" .. rank .. ")"
+        end
+        return name
+    end
 
     function Setup:Castbar(parent)
         CastingBarFrame:Hide()
@@ -147,6 +188,18 @@ DFRL:NewMod("Cast", 1, function()
             self.spark2 = spark2
         end
 
+        -- channel tick markers
+        for i = 1, self.MAX_TICK_MARKERS do
+            local marker = f:CreateTexture(nil, "OVERLAY")
+            marker:SetWidth(5)
+            marker:SetHeight(self.config.height)
+            marker:SetTexture(self.config.spark)
+            marker:SetBlendMode("ADD")
+            marker:SetVertexColor(1,1,1)
+            marker:Hide()
+            self.tickMarkers[i] = marker
+        end
+
         -- flash
         if self.config.animations.useFlash then
             local flash = f:CreateTexture(nil, "OVERLAY")
@@ -179,9 +232,10 @@ DFRL:NewMod("Cast", 1, function()
         f:RegisterEvent("SPELLCAST_CHANNEL_STOP")
         f:RegisterEvent("SPELLCAST_CHANNEL_START")
         f:RegisterEvent("SPELLCAST_CHANNEL_UPDATE")
+        f:RegisterEvent("UNIT_CASTEVENT")
 
         f:SetScript("OnEvent", function()
-            Setup:HandleEvent(event, arg1, arg2)
+            Setup:HandleEvent(event, arg1, arg2, arg3, arg4, arg5)
         end)
 
         f:SetScript("OnUpdate", function()
@@ -259,6 +313,36 @@ DFRL:NewMod("Cast", 1, function()
         elseif self.spark then
             self.spark:Hide()
             if self.spark2 then self.spark2:Hide() end
+        end
+    end
+
+    function Setup:SetTickMarkers(spellName)
+        self:ClearTickMarkers()
+        if not self.config.showChannelTicks then return end
+
+        -- strip rank suffix e.g. "Mind Flay(Rank 3)" -> "Mind Flay"
+        local baseName = string.gsub(spellName or "", "%s*%(.*%)", "")
+        local tickCount = channelingTicks[baseName]
+        if not tickCount or tickCount < 2 then return end
+
+        local totalWidth = self.config.width
+        local delta = totalWidth / tickCount
+
+        for k = 1, tickCount - 1 do
+            local marker = self.tickMarkers[k]
+            if not marker then break end
+            marker:ClearAllPoints()
+            marker:SetPoint("CENTER", self.frame, "LEFT", delta * k, 0)
+            marker:SetHeight(self.config.height)
+            marker:Show()
+        end
+    end
+
+    function Setup:ClearTickMarkers()
+        for i = 1, self.MAX_TICK_MARKERS do
+            if self.tickMarkers[i] then
+                self.tickMarkers[i]:Hide()
+            end
         end
     end
 
@@ -379,7 +463,9 @@ DFRL:NewMod("Cast", 1, function()
         end
     end
 
-    function Setup:HandleEvent(event, arg1, arg2)
+    local playerGUID = nil
+
+    function Setup:HandleEvent(event, arg1, arg2, arg3, arg4, arg5)
 
         local s = self.state
         local c = self.config
@@ -392,7 +478,8 @@ DFRL:NewMod("Cast", 1, function()
             self.barTexture:SetVertexColor(c.barColor.r, c.barColor.g, c.barColor.b)
             self:UpdateBarVisual(0)
 
-            self.text:SetText(arg1)
+            s.castSpellName = s.castSpellName or arg1
+            self.text:SetText(fmtSpell(s.castSpellName, s.castSpellRank, c.showSpellRank))
             s.holdTime = 0
             s.casting = true
             s.channeling = false
@@ -413,8 +500,13 @@ DFRL:NewMod("Cast", 1, function()
 
             if event == "SPELLCAST_STOP" then
                 s.casting = false
+                s.castSpellName = nil
+                s.castSpellRank = nil
             else
                 s.channeling = false
+                s.channelingSpell = nil
+                s.channelingRank = nil
+                self:ClearTickMarkers()
             end
 
             s.flash = true
@@ -431,6 +523,7 @@ DFRL:NewMod("Cast", 1, function()
             if self.frame:IsShown() and not s.channeling then
             s.currentProgress = 1
             self:UpdateBarVisual(1)
+            self:ClearTickMarkers()
             self.barTexture:SetVertexColor(1, 0, 0)
 
             if event == "SPELLCAST_INTERRUPTED" then
@@ -446,6 +539,8 @@ DFRL:NewMod("Cast", 1, function()
             end
 
             s.casting = false
+            s.castSpellName = nil
+            s.castSpellRank = nil
             s.fadeOut = true
             s.holdTime = GetTime() + c.holdTimeDuration
             s.mode = "hold"
@@ -467,7 +562,7 @@ DFRL:NewMod("Cast", 1, function()
             self.barTexture:SetVertexColor(c.barColor.r, c.barColor.g, c.barColor.b)
             self:UpdateBarVisual(1)
 
-            self.text:SetText(arg2)
+            self.text:SetText(fmtSpell(s.channelingSpell or "Channeling", s.channelingRank, c.showSpellRank))
             s.holdTime = 0
             s.casting = false
             s.channeling = true
@@ -477,6 +572,31 @@ DFRL:NewMod("Cast", 1, function()
             s.mode = "channeling"
             self.frame:SetAlpha(1)
             self.frame:Show()
+
+        elseif event == "UNIT_CASTEVENT" then
+            -- lazy-init player GUID using SuperWoW's extended UnitExists
+            if not playerGUID then
+                local _, exists, guid = pcall(UnitExists, "player")
+                if exists then playerGUID = guid end
+            end
+            if arg1 == playerGUID then
+                if arg3 == "CHANNEL" then
+                    local name, rank = SpellInfo(arg4)
+                    if name then
+                        s.channelingSpell = name
+                        s.channelingRank = rank
+                        self.text:SetText(fmtSpell(name, rank, c.showSpellRank))
+                        self:SetTickMarkers(name)
+                    end
+                elseif arg3 == "START" then
+                    local name, rank = SpellInfo(arg4)
+                    if name then
+                        s.castSpellName = name
+                        s.castSpellRank = rank
+                        self.text:SetText(fmtSpell(name, rank, c.showSpellRank))
+                    end
+                end
+            end
 
         elseif event == "SPELLCAST_CHANNEL_UPDATE" then
             if self.frame:IsShown() then
@@ -561,6 +681,9 @@ DFRL:NewMod("Cast", 1, function()
         Setup.frame:SetWidth(value)
         Setup.dropshadow:SetWidth(value + 1)
         Setup:UpdateBarVisual(Setup.state.currentProgress)
+        if Setup.state.channeling and Setup.state.channelingSpell then
+            Setup:SetTickMarkers(Setup.state.channelingSpell)
+        end
     end
 
     callbacks.barHeight = function(value)
@@ -570,6 +693,32 @@ DFRL:NewMod("Cast", 1, function()
         Setup.spark:SetHeight(value + 15)
         Setup.spark2:SetHeight(value + 15)
         Setup.dropshadow:SetHeight(value + 9)
+        for i = 1, Setup.MAX_TICK_MARKERS do
+            if Setup.tickMarkers[i] then
+                Setup.tickMarkers[i]:SetHeight(value)
+            end
+        end
+    end
+
+    callbacks.showRank = function(value)
+        Setup.config.showSpellRank = value
+        local s = Setup.state
+        if Setup.frame:IsShown() then
+            if s.casting and s.castSpellName then
+                Setup.text:SetText(fmtSpell(s.castSpellName, s.castSpellRank, value))
+            elseif s.channeling and s.channelingSpell then
+                Setup.text:SetText(fmtSpell(s.channelingSpell, s.channelingRank, value))
+            end
+        end
+    end
+
+    callbacks.showTicks = function(value)
+        Setup.config.showChannelTicks = value
+        if not value then
+            Setup:ClearTickMarkers()
+        elseif Setup.state.channeling and Setup.state.channelingSpell then
+            Setup:SetTickMarkers(Setup.state.channelingSpell)
+        end
     end
 
     callbacks.fontSize = function(value)
